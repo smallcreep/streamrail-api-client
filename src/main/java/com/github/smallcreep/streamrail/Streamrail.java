@@ -22,4 +22,15 @@ public interface Streamrail {
      */
     Request request();
 
+    /**
+     * Get custom reports.
+     * @return Reports
+     */
+    Reports reports();
+
+    /**
+     * Get Base url.
+     * @return Base url
+     */
+    String base();
 }

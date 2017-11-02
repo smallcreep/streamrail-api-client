@@ -1,0 +1,3 @@
+StreamRail-Version: 1.0-SNAPSHOT
+StreamRail-Build: 1001
+StreamRail-Date: 02 November 2017

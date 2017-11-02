@@ -73,9 +73,9 @@ dependencies {
 
 test {
     systemProperties = [
-            "failsafe.streamrail.username"        : (project.hasProperty('streamrailUsername') ? getProperty('streamrailUsername') : System.getenv("username")),
-            "failsafe.streamrail.password"        : (project.hasProperty('streamrailPassword') ? getProperty('streamrailPassword') : System.getenv("password")),
-            "failsafe.streamrail.trafficChannelId": (project.hasProperty('streamrailTrafficChannelId') ? getProperty('streamrailTrafficChannelId') : System.getenv("trafficChannelId"))
+            "failsafe.streamrail.username": (project.hasProperty('streamrailUsername') ? getProperty('streamrailUsername') : System.getenv("username")),
+            "failsafe.streamrail.password": (project.hasProperty('streamrailPassword') ? getProperty('streamrailPassword') : System.getenv("password")),
+            "failsafe.streamrail.reportId": (project.hasProperty('streamrailReportId') ? getProperty('streamrailReportId') : System.getenv("reportId"))
     ]
 }
 
