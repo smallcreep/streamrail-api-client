@@ -32,7 +32,6 @@ import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.json.JsonObject;
@@ -138,7 +137,6 @@ final class RetryReport implements Report {
                 .headers()
                 .get(HttpHeaders.LOCATION)
                 .get(0);
-            System.out.println(location);
             final File file = File.createTempFile("report", ".zip");
             new LengthOf(
                 new TeeInput(
@@ -152,7 +150,6 @@ final class RetryReport implements Report {
                     )
                 )
             ).value();
-            System.out.println(file.getAbsolutePath());
             return file;
         }
         throw new HttpRetryException(
