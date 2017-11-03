@@ -37,6 +37,10 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.json.JsonObject;
 import javax.ws.rs.core.HttpHeaders;
+import org.cactoos.io.InputOf;
+import org.cactoos.io.LengthOf;
+import org.cactoos.io.OutputTo;
+import org.cactoos.io.TeeInput;
 
 /**
  * Retry request export while don't read file.
@@ -135,11 +139,21 @@ final class RetryReport implements Report {
                 .get(HttpHeaders.LOCATION)
                 .get(0);
             System.out.println(location);
-            return Paths.get(
-                new URI(
-                    location
+            final File file = File.createTempFile("report", ".zip");
+            new LengthOf(
+                new TeeInput(
+                    new InputOf(
+                        new URI(
+                            location
+                        )
+                    ),
+                    new OutputTo(
+                        file
+                    )
                 )
-            ).toFile();
+            ).value();
+            System.out.println(file.getAbsolutePath());
+            return file;
         }
         throw new HttpRetryException(
             "Not found correct request",
