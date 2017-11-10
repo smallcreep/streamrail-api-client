@@ -64,7 +64,7 @@ public interface Auth {
          * @param user Username
          * @param password Password
          */
-        Simple(final String user, final String password) {
+        public Simple(final String user, final String password) {
             this(Streamrail.BASE_URL, user, password);
         }
 
@@ -74,7 +74,7 @@ public interface Auth {
          * @param user Username
          * @param password Password
          */
-        Simple(final String url, final String user, final String password) {
+        public Simple(final String url, final String user, final String password) {
             this(
                 url,
                 new ApacheRequest(url)
