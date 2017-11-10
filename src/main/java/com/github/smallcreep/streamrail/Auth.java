@@ -74,7 +74,11 @@ public interface Auth {
          * @param user Username
          * @param password Password
          */
-        public Simple(final String url, final String user, final String password) {
+        public Simple(
+            final String url,
+            final String user,
+            final String password
+        ) {
             this(
                 url,
                 new ApacheRequest(url)
