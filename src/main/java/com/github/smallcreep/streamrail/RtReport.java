@@ -105,10 +105,9 @@ final class RtReport implements Report {
     }
 
     @Override
-    public File export() throws IOException, URISyntaxException {
-        final Streamrail streamrail = this.reports
-            .origin();
-        streamrail
+    public Report generate() throws IOException {
+        this.reports
+            .origin()
             .request()
             .uri()
             .path(
@@ -118,17 +117,38 @@ final class RtReport implements Report {
             .fetch()
             .as(RestResponse.class)
             .assertStatus(HttpURLConnection.HTTP_OK);
-        return new RetryReport(
-            this,
-            this.req
-                .uri()
-                .set(
-                    new URI(
-                        streamrail.base()
-                    )
-                ).path("/data-export/data/custom/" + this.id)
-                .back()
-        ).export();
+        return this;
+    }
+
+    @Override
+    public File export() throws IOException, URISyntaxException {
+        if (this.generated()) {
+            return new ExportReport(
+                this,
+                this.req
+                    .uri()
+                    .set(
+                        new URI(
+                            this.reports.origin().base()
+                        )
+                    ).path("/data-export/data/custom/" + this.id)
+                    .back()
+            ).export();
+        }
+        throw new IOException("Report didn't complete generate");
+    }
+
+    /**
+     * Generated report checker.
+     * @return True if report was generated
+     * @throws IOException If fail
+     */
+    private boolean generated() throws IOException {
+        return "DONE".equals(
+            this.json()
+                .getJsonObject("customReport")
+                .getString("reportStatus")
+        );
     }
 
     @Override

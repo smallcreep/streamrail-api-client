@@ -94,4 +94,11 @@ final class UpdateReport implements Report {
                    )
                    .build();
     }
+
+    @Override
+    public Report generate() throws IOException {
+        return new UpdateReport(
+            this.origin.generate()
+        );
+    }
 }

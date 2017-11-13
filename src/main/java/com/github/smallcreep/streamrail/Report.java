@@ -24,6 +24,13 @@ public interface Report extends JsonReadable {
     Report range(ZonedDateTime start, ZonedDateTime end) throws IOException;
 
     /**
+     * Generate report.
+     * @return Report
+     * @throws IOException If fails
+     */
+    Report generate() throws IOException;
+
+    /**
      * Export custom StreamRail report.
      * @return Report file
      * @throws IOException If fails

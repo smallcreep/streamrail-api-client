@@ -44,19 +44,21 @@ public final class ReportITCase {
      */
     @Test
     public void reportReturn() throws Exception {
-        new Auth.Simple(
-            System.getProperty("failsafe.streamrail.username"),
-            System.getProperty("failsafe.streamrail.password")
-        )
-            .streamrail()
-            .reports()
-            .report(System.getProperty("failsafe.streamrail.reportId"))
-            .range(
-                LocalDateTime.of(2017, 11, 1, 0, 0)
-                             .atZone(ZoneOffset.UTC),
-                LocalDateTime.of(2017, 11, 1, 0, 0)
-                             .atZone(ZoneOffset.UTC)
+        new RetryReport(
+            new Auth.Simple(
+                System.getProperty("failsafe.streamrail.username"),
+                System.getProperty("failsafe.streamrail.password")
             )
+                .streamrail()
+                .reports()
+                .report(System.getProperty("failsafe.streamrail.reportId"))
+                .range(
+                    LocalDateTime.of(2017, 11, 1, 0, 0)
+                                 .atZone(ZoneOffset.UTC),
+                    LocalDateTime.of(2017, 11, 1, 0, 0)
+                                 .atZone(ZoneOffset.UTC)
+                )
+        )
             .export();
     }
 }

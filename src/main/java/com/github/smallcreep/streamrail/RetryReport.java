@@ -24,22 +24,14 @@
 
 package com.github.smallcreep.streamrail;
 
-import com.jcabi.http.Request;
-import com.jcabi.http.response.RestResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.json.JsonObject;
-import javax.ws.rs.core.HttpHeaders;
-import org.cactoos.io.InputOf;
-import org.cactoos.io.LengthOf;
-import org.cactoos.io.OutputTo;
-import org.cactoos.io.TeeInput;
 
 /**
  * Retry request export while don't read file.
@@ -48,7 +40,7 @@ import org.cactoos.io.TeeInput;
  * @version $Id$
  * @since 0.1
  */
-final class RetryReport implements Report {
+public final class RetryReport implements Report {
 
     /**
      * Origin Report.
@@ -66,11 +58,6 @@ final class RetryReport implements Report {
     private final int max;
 
     /**
-     * Request for retry.
-     */
-    private final Request req;
-
-    /**
      * Request counter.
      */
     private final AtomicInteger counter = new AtomicInteger(0);
@@ -78,29 +65,24 @@ final class RetryReport implements Report {
     /**
      * Ctor.
      * @param origin Origin Report
-     * @param req Request to retry
      * @checkstyle MagicNumberCheck (3 lines)
      */
-    RetryReport(final Report origin, final Request req) {
-        this(origin, req, 2000L, 20);
+    public RetryReport(final Report origin) {
+        this(origin, 2000L, 20);
     }
 
     /**
      * Ctor.
      * @param origin Origin Report
-     * @param req Request to retry
      * @param waiting Waiting milliseconds between requests
      * @param max Max count to retry requests
-     * @checkstyle ParameterNumberCheck (5 lines)
      */
-    RetryReport(
+    public RetryReport(
         final Report origin,
-        final Request req,
         final long waiting,
         final int max
     ) {
         this.origin = origin;
-        this.req = req;
         this.waiting = waiting;
         this.max = max;
     }
@@ -112,45 +94,25 @@ final class RetryReport implements Report {
     ) throws IOException {
         return new RetryReport(
             this.origin.range(start, end),
-            this.req,
             this.waiting,
             this.max
         );
     }
 
     @Override
-    public File export() throws IOException, URISyntaxException {
+    public File export() throws IOException {
         while (
-            this.counter.getAndSet(this.counter.get() + 1) < this.max
-                && this.retry()) {
+            this.counter.getAndSet(this.counter.get() + 1) < this.max) {
+            try {
+                return this.origin.export();
+            } catch (final IOException | URISyntaxException exception) {
+                // do nothing
+            }
             try {
                 Thread.sleep(this.waiting);
             } catch (final InterruptedException exception) {
                 Thread.currentThread().interrupt();
             }
-        }
-        if (this.counter.get() < this.max) {
-            final String location = this.req
-                .fetch()
-                .as(RestResponse.class)
-                .assertStatus(HttpURLConnection.HTTP_MOVED_TEMP)
-                .headers()
-                .get(HttpHeaders.LOCATION)
-                .get(0);
-            final File file = File.createTempFile("report", ".zip");
-            new LengthOf(
-                new TeeInput(
-                    new InputOf(
-                        new URI(
-                            location
-                        )
-                    ),
-                    new OutputTo(
-                        file
-                    )
-                )
-            ).value();
-            return file;
         }
         throw new HttpRetryException(
             "Not found correct request",
@@ -163,17 +125,12 @@ final class RetryReport implements Report {
         return this.origin.json();
     }
 
-    /**
-     * Retry checker.
-     * @return True if need retry
-     * @throws IOException If fail
-     */
-    private boolean retry() throws IOException {
-        return !"DONE".equals(
-            this.origin
-                .json()
-                .getJsonObject("customReport")
-                .getString("reportStatus")
+    @Override
+    public Report generate() throws IOException {
+        return new RetryReport(
+            this.origin.generate(),
+            this.waiting,
+            this.max
         );
     }
 }
