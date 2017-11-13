@@ -57,7 +57,9 @@ public final class ReportITCase {
                                  .atZone(ZoneOffset.UTC),
                     LocalDateTime.of(2017, 11, 1, 0, 0)
                                  .atZone(ZoneOffset.UTC)
-                )
+                ),
+            4000L,
+            30
         )
             .export();
     }
